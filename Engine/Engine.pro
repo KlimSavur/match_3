@@ -9,12 +9,12 @@ uri = Engine
 
 # Input
 SOURCES += \
-        engine_plugin.cpp \
-        bublesmodel.cpp
+        bubblesmodel.cpp \
+        engine_plugin.cpp
 
 HEADERS += \
-        engine_plugin.h \
-        bublesmodel.h
+        bubblesmodel.h \
+        engine_plugin.h
 
 DISTFILES = qmldir
 
@@ -33,6 +33,7 @@ unix {
     target.path = $$installPath
     INSTALLS += target qmldir
 }
+
 # Copy the qmldir file to the same folder as the plugin binary
 cpqmldir.files = qmldir
 cpqmldir.path = $$DESTDIR

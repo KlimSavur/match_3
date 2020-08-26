@@ -1,4 +1,4 @@
-#include "bublesmodel.h"
+#include "bubblesmodel.h"
 
 BublesModel::BublesModel(QQuickItem *parent)
     : QQuickItem(parent)

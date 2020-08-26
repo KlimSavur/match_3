@@ -1,6 +1,6 @@
 #include "engine_plugin.h"
 
-#include "bublesmodel.h"
+#include "bubblesmodel.h"
 
 #include <qqml.h>
 

@@ -1,5 +1,10 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
+        <file>Board.qml</file>
+        <file>Bubble.qml</file>
+        <file>../cfg.json</file>
+        <file>WindowBG.qml</file>
+        <file>HeaderBar.qml</file>
     </qresource>
 </RCC>
