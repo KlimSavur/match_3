@@ -6,7 +6,7 @@ CONFIG += plugin c++11
 DESTDIR = ./Engine
 TARGET = $$qtLibraryTarget($$TARGET)
 uri = Engine
-
+QML_XHR_ALLOW_FILE_READ=1
 # Input
 SOURCES += \
         bubblesmodel.cpp \

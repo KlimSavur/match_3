@@ -5,6 +5,7 @@ ToolBar {
     id: root
     property int score: 0
     property int moves: 0
+    signal restartPressed()
     height: 70
     background: Rectangle {
         anchors.fill: parent
@@ -19,8 +20,9 @@ ToolBar {
     ToolButton {
         anchors.centerIn: parent
         text: qsTr("Restart")
+        onClicked: root.restartPressed()
     }
-    Text{
+    Text {
         anchors.right: parent.right
         anchors.rightMargin: root.height
         anchors.verticalCenter: parent.verticalCenter

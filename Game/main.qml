@@ -3,24 +3,28 @@ import QtQuick.Controls 2.12
 ApplicationWindow {
     id: _window
 
-    property int xCell: 0
-    property int yCell: 0
+    property int columns: 0
+    property int rows: 0
 
     visible: true
     width: 480
-    height: _header.height + width / xCell * yCell
+    height: _header.height + width / columns * rows
     title: qsTr("Match 3")
 
     background: WindowBG { anchors.fill: parent }
 
-    header: HeaderBar { id: _header }
+    header: HeaderBar {
+        id: _header
+        moves: 0
+        score: 0
+        onRestartPressed: ;
+    }
 
     Board {
         id: _gridView
         anchors.fill: parent
-        cellWidth: _window.width / _window.xCell
-        cellHeight: (_window.height - _header.height) / _window.yCell
-        model: _window.xCell*_window.yCell
+        cellWidth: _window.width / _window.columns
+        cellHeight: (_window.height - _header.height) / _window.rows
     }
 
     Component.onCompleted: {
@@ -29,8 +33,8 @@ ApplicationWindow {
         xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 var js = JSON.parse(xhr.responseText)
-                _window.xCell = js.width
-                _window.yCell = js.height
+                _window.columns = js.width
+                _window.rows = js.height
             }
        }
        xhr.send();
