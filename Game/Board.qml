@@ -5,6 +5,7 @@ GridView {
     id: root
     property int wRows: 0
     property int wColumns: 0
+    signal restart()
     interactive: false
     clip: true
 
@@ -15,6 +16,10 @@ GridView {
     delegate: Bubble {
         width: root.cellWidth - 2
         height: root.cellHeight - 2
-        bubbleColor: display
+        dragParent: root
+    }
+    onRestart: {
+        _model.generateBoard()
+
     }
 }

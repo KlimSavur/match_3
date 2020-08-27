@@ -18,8 +18,8 @@ public:
     QVariant data(const QModelIndex &index, int role) const override;
 
     Q_INVOKABLE void generateBoard();
-
-
+    Q_INVOKABLE void move(int from, int to);
+    Q_INVOKABLE void remove();
 private:
     QVector<int> simpleMatch() const;
     void move();
