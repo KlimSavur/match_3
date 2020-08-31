@@ -36,6 +36,7 @@ QVector<int> BublesModel::simpleMatch() const{
     for (int i = 0; i < m_rows; ++i){
         for (int j = 0; j < m_columns; ++j){
             counter = m_columns * i + j;
+            if (counter >= m_elements.count()) return QVector<int>({0, 0, 0});
             if (j < m_columns - 2){
                 if ((m_elements[counter] == m_elements[counter + 1]) && \
                         (m_elements[counter] == m_elements[counter + 2])){
@@ -56,6 +57,7 @@ QVector<int> BublesModel::simpleMatch() const{
 QVector<int> BublesModel::findMatch() const
 {
     QVector<int> result = simpleMatch();
+    qDebug() << "result " << (result != QVector<int>({0, 0, 0}));
     if (result != QVector<int>({0, 0, 0})){
         int counter = 0;
         if ((result[1] - result[0]) == 1){
@@ -97,7 +99,6 @@ void BublesModel::generateBoard()
 
 void BublesModel::move(int from, int to)
 {
-    static bool reset = true;
     int offset = to - from;
     if (from < 0|| from >= m_elements.count()){
         return;
@@ -124,61 +125,56 @@ void BublesModel::move(int from, int to)
         m_elements.move(to + ((offset < 0) ? 1 : -1), from);
         emit endMoveRows();
     }
-    if (reset){
-        if (simpleMatch() == QVector<int>({0, 0, 0})){
-            reset = false;
-            move(to, from);
-            reset = true;
-        }
-        else{
-            remove();
-        }
+    if (simpleMatch() == QVector<int>({0, 0, 0})){
+        move(to, from);
     }
 }
-/*void BublesModel::colapce(QVector<int> i){
-    for (int counter = 0; counter <= i[0] % m_columns; ++counter){
-        emit beginMoveRows(QModelIndex(), i[0]- m_columns*counter, i[i.count() - 1]- m_columns*counter, QModelIndex(), i[0] - m_columns*(counter+1));
-        for (const auto& k: i ){
-            move(k - m_columns*counter, k - m_columns*(counter + 1));
-            int offset = m_columns - i.count();
-
-        }
-        emit endMoveRows();
-//        emit beginResetModel();
-//        for (const auto& k: i ){
-//            move(k+i.size(), k - i.size());
-//        }
-//        emit endResetModel();
+void BublesModel::colapce(){
+    qDebug() << m_colapse;
+        if (m_colapse.count() >= 3){
+            int j = 0;
+            int from = 0, to = 0;
+            int end = 0;
+            for(const auto& c : m_colapse){
+                emit beginInsertRows(QModelIndex(), c, c);
+                m_elements.insert(c, randomColor());
+                emit endInsertRows();
+            }
+            end = (m_colapse[1] - m_colapse[0] == 1) ? (m_colapse.last()) : (m_colapse.first());
+            while (m_colapse.first() - m_columns * (j + 1) >= 0){
+                for (int i = m_colapse.first(); i <= end; ++i){
+                    from = i - m_columns - m_columns * j;
+                    to = (m_colapse[1] - m_colapse[0] == 1) ? (i - m_columns * j) : (m_colapse.last());
+                    qDebug() << "from " << from << " to " << to;
+                    emit beginMoveRows(QModelIndex(), from , from, QModelIndex(),to + 1);
+                    m_elements.move(from, to);
+                    emit endMoveRows();
+                    emit beginMoveRows(QModelIndex(), to - 1 , to - 1, QModelIndex(), from);
+                    m_elements.move(to - 1, from);
+                    emit endMoveRows();
+                }
+                j++;
+            }
 
     }
-//    for (int k = 0; k < counter; k++){
-//        emit beginInsertRows(QModelIndex(), i - k*m_columns, i - k*m_columns);
-//        m_elements.insert(i - k*m_columns, randomColor());
-//        emit endInsertRows();
-//    }
-}*/
+    m_colapse.clear();
+}
 
 
 
 void BublesModel::remove(){
 //        while (simpleMatch() != QVector<int>({0, 0, 0})){
         QVector<int> temp_vec = findMatch();
-        qDebug() << temp_vec;
         if (temp_vec[1] - temp_vec[0] == 1){
-            emit beginRemoveRows(QModelIndex(), temp_vec.first(), temp_vec.last());
-            for (auto i = temp_vec.count() - 1; i >= 0; --i){
-                qDebug() << "removing " << temp_vec[i]<< "length is" << i;
-                m_elements.remove(temp_vec[i]);
-//                emit beginInsertRows(QModelIndex(),temp_vec[i],temp_vec[i]);
-//                m_elements.insert(temp_vec[i], QColor("white"));
-//                emit endInsertRows();
+            int deleted = 0;
+            for (const auto& i : temp_vec){
+                m_elements.remove(i - deleted);
+                emit beginRemoveRows(QModelIndex(), i - deleted, i - deleted);
+                deleted++;
+                emit endRemoveRows();
             }
-            emit endRemoveRows();
-//            emit beginResetModel();
-//            emit endResetModel();
-//            colapce(temp_vec);
         }
-        else{
+        else if (temp_vec[1] - temp_vec[0] == m_columns){
             for (auto i = temp_vec.count() - 1; i >= 0; --i){
                 emit beginRemoveRows(QModelIndex(), temp_vec[i], temp_vec[i]);
                 qDebug() << "removing " << temp_vec[i] << "length is NE TO" ;
@@ -186,6 +182,7 @@ void BublesModel::remove(){
                 emit endRemoveRows();
             }
         }
+        m_colapse = temp_vec;
 //    }
 }
 

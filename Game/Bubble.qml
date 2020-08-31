@@ -2,11 +2,27 @@ import QtQuick 2.12
 
 Item {
     id: root
+    //GridView.delayRemove: true
+    GridView.onRemove: SequentialAnimation {
+            PropertyAction { target: root; property: "GridView.delayRemove"; value: true }
+            NumberAnimation { target: root; property: "scale"; to: 0; duration: 1000; easing.type: Easing.InElastic }
+            PropertyAction { target: root; property: "GridView.delayRemove"; value: false }
+            ScriptAction{ script: colapse()}
+    }
+
+    //GridView.OnDisplaced: NumberAnimation { target: root; properties: "x,y"; easing.type: Easing.OutInBack;}
+
+
+    //GridView.onMove: NumberAnimation { target: root; properties: "x, y"; duration: 300; easing.type:  Easing.InOutBounce}
+
+
     required property color display
     required property int index
     required property Item dragParent
     signal pressed(int index)
     signal move(int from, int to)
+    signal remove()
+    signal colapse()
     DropArea {
         id: _dropArea
         property color display : root.display
@@ -14,13 +30,14 @@ Item {
         property Item dragParent : root.dragParent
 
         onDropped: function(drop){
-            var from = (drag.source as Rectangle).visualIndex
-            var to = _bubble.visualIndex
-            move(from, to)
-
+            remove()
+            GridView.delayRemove = false;
         }
         onEntered: function(drag){
-        ;
+        var from = (drag.source as Rectangle).visualIndex
+            var to = _bubble.visualIndex
+            console.log("from " + from + " to " + to)
+            move(from, to)
         }
 
         width: root.width
@@ -66,5 +83,5 @@ Item {
             ]
 
         }
-    } 
+    }
 }

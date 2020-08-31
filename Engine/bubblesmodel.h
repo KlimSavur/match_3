@@ -19,6 +19,8 @@ public:
     Q_INVOKABLE void generateBoard();
     Q_INVOKABLE void move(int from, int to);
     Q_INVOKABLE void remove();
+    Q_INVOKABLE void colapce();
+
 signals:
     void deleted();
 private:
@@ -32,7 +34,7 @@ private:
     QVector<QColor> m_elements;
     ushort m_rows;
     ushort m_columns;
-    void colapce(QVector<int> i);
+    QVector<int> m_colapse;
 };
 
 #endif // BUBLESMODEL_H

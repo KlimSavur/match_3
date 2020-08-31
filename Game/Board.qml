@@ -9,7 +9,7 @@ GridView {
     interactive: false
     clip: true
 
-    model: BublesModel{
+    model: BublesModel {
         id: _model
     }
 
@@ -20,28 +20,23 @@ GridView {
         onPressed: {
             current = index;
         }
+        onRemove: {
+            _model.remove();
+        }
+
         onMove: {
             _model.move(from, to)
             score++
+        }
+        onColapse: {
+            _model.colapce()
         }
     }
 
     onRestart: {
         _model.generateBoard()
-    }
-    displaced: Transition{
-        NumberAnimation{ properties: "x,y"; easing.type: Easing.OutInBack;}
-    }
-    GridView.delayRemove: true
-    remove: Transition{
-        SequentialAnimation{
-//            PropertyAction { property: "GridView.delayRemove"; value: true }
-            NumberAnimation { property: "scale"; to: 0; duration: 1000; easing.type: Easing.InElastic }
-//            PropertyAction { property: "GridView.delayRemove"; value: false }
-        }
+        score = 0
     }
 
-    move: Transition {
-        NumberAnimation { properties: "x, y"; duration: 3000; easing.type:  Easing.InOutBounce}
-    }
+
 }
