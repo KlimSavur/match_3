@@ -5,6 +5,7 @@ ApplicationWindow {
     id: _window
     property int cellHeightJSON: 0
     property int cellWidthJSON: 0
+    property int score: _gridView.score
     visible: true
     width: 480
     title: qsTr("Match 3")
@@ -13,8 +14,7 @@ ApplicationWindow {
 
     header: HeaderBar {
         id: _header
-        moves: 0
-        score: 0
+        moves: parent.score
         onRestartPressed: _gridView.restart();
     }
 

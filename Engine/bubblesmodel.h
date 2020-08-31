@@ -16,10 +16,11 @@ public:
     ~BublesModel() override;
     int rowCount(const QModelIndex&) const override;
     QVariant data(const QModelIndex &index, int role) const override;
-
     Q_INVOKABLE void generateBoard();
     Q_INVOKABLE void move(int from, int to);
     Q_INVOKABLE void remove();
+signals:
+    void deleted();
 private:
     QVector<int> simpleMatch() const;
     void move();
@@ -31,6 +32,7 @@ private:
     QVector<QColor> m_elements;
     ushort m_rows;
     ushort m_columns;
+    void colapce(QVector<int> i);
 };
 
 #endif // BUBLESMODEL_H

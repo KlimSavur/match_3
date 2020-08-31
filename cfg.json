@@ -1,5 +1,6 @@
 {
-		"width": 20,
-	"height": 20,
-	"colors":["red", "green", "white", "blue"]
-}
+        "width": 4,
+        "height": 4,
+	"colors":["red", "green", "yellow", "blue"],
+	"_comment": "WHITE COLOR IS RESTRICTED"
+}	
