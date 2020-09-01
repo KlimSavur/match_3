@@ -31,22 +31,22 @@ ApplicationWindow {
         xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 var js = JSON.parse(xhr.responseText)
-                if (js.width > 20){
+                if (js.columns > 20){
                     width = 600
                 }
-                height = _header.height + (_header.width / js.width) * js.height
+                height = _header.height + (_header.width / js.columns) * js.rows
                 if (height > Screen.desktopAvailableHeight){
                     height = Screen.desktopAvailableHeight;
-                    cellHeightJSON = (height - _header.height) / js.height
-                    width = cellHeightJSON * js.width
+                    cellHeightJSON = (height - _header.height) / js.rows
+                    width = cellHeightJSON * js.columns
                 } else {
-                    cellHeightJSON = width / js.width
+                    cellHeightJSON = width / js.columns
                 }
                 maximumHeight= height
                 maximumWidth= width
                 minimumHeight= height
                 minimumWidth= width
-                cellWidthJSON = width / js.width
+                cellWidthJSON = width / js.columns
             }
        }
        xhr.send();

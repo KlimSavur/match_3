@@ -1,5 +1,4 @@
-#ifndef ENGINE_PLUGIN_H
-#define ENGINE_PLUGIN_H
+#pragma once
 
 #include <QQmlExtensionPlugin>
 
@@ -11,5 +10,3 @@ class EnginePlugin : public QQmlExtensionPlugin
 public:
     void registerTypes(const char *uri) override;
 };
-
-#endif // ENGINE_PLUGIN_H

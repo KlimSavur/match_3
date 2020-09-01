@@ -1,5 +1,4 @@
-#ifndef BUBLESMODEL_H
-#define BUBLESMODEL_H
+#pragma once
 
 #include <QAbstractListModel>
 #include <QFile>
@@ -8,33 +7,28 @@
 #include <QColor>
 #include <QRandomGenerator>
 
-class BublesModel : public QAbstractListModel
+class BubblesModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
-    BublesModel(QObject *parent = nullptr);
-    ~BublesModel() override;
+    BubblesModel(QObject *parent = nullptr);
+    ~BubblesModel() override;
     int rowCount(const QModelIndex&) const override;
     QVariant data(const QModelIndex &index, int role) const override;
     Q_INVOKABLE void generateBoard();
     Q_INVOKABLE void move(int from, int to);
     Q_INVOKABLE void remove();
-    Q_INVOKABLE void colapce();
-
-signals:
-    void deleted();
+    Q_INVOKABLE void collapse();
 private:
     QVector<int> simpleMatch() const;
-    void move();
     void loadFromJSON();
     void checkBoard();
     QVector<int> findMatch() const;
     QColor randomColor() const;
+    void applyMove(int from, int to);
     QList<QColor> m_avaliableColors;
     QVector<QColor> m_elements;
     ushort m_rows;
     ushort m_columns;
-    QVector<int> m_colapse;
+    QVector<int> m_collapse;
 };
-
-#endif // BUBLESMODEL_H

@@ -2,24 +2,19 @@ import QtQuick 2.12
 
 Item {
     id: root
-    //GridView.delayRemove: true
     GridView.onRemove: SequentialAnimation {
             PropertyAction { target: root; property: "GridView.delayRemove"; value: true }
             NumberAnimation { target: root; property: "scale"; to: 0; duration: 1000; easing.type: Easing.InElastic }
             PropertyAction { target: root; property: "GridView.delayRemove"; value: false }
-            ScriptAction{ script: colapse()}
+            ScriptAction { script: colapse() }
+            NumberAnimation { target: root; property: "opacity"; to: 0; duration: 200}
+
+            ScriptAction { script: remove() }
     }
-
-    //GridView.OnDisplaced: NumberAnimation { target: root; properties: "x,y"; easing.type: Easing.OutInBack;}
-
-
-    //GridView.onMove: NumberAnimation { target: root; properties: "x, y"; duration: 300; easing.type:  Easing.InOutBounce}
-
 
     required property color display
     required property int index
     required property Item dragParent
-    signal pressed(int index)
     signal move(int from, int to)
     signal remove()
     signal colapse()
@@ -31,12 +26,10 @@ Item {
 
         onDropped: function(drop){
             remove()
-            GridView.delayRemove = false;
         }
         onEntered: function(drag){
         var from = (drag.source as Rectangle).visualIndex
             var to = _bubble.visualIndex
-            console.log("from " + from + " to " + to)
             move(from, to)
         }
 
@@ -48,7 +41,6 @@ Item {
             anchors.fill: _bubble
             drag.target: _bubble
             onReleased: _bubble.Drag.drop()
-            onPressed: { root.pressed(index)}
         }
 
         Rectangle {

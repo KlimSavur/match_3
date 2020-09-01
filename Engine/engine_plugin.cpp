@@ -7,6 +7,6 @@
 void EnginePlugin::registerTypes(const char *uri)
 {
     // @uri Engine
-    qmlRegisterType<BublesModel>(uri, 1, 0, "BublesModel");
+    qmlRegisterType<BubblesModel>(uri, 1, 0, "BubblesModel");
 }
 

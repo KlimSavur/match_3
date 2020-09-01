@@ -3,13 +3,12 @@ import Engine 1.0
 
 GridView {
     id: root
-    property int current: 0
     property int score: 0
     signal restart()
     interactive: false
     clip: true
 
-    model: BublesModel {
+    model: BubblesModel {
         id: _model
     }
 
@@ -17,9 +16,6 @@ GridView {
         width: root.cellWidth - 2
         height: root.cellHeight - 2
         dragParent: root
-        onPressed: {
-            current = index;
-        }
         onRemove: {
             _model.remove();
         }
