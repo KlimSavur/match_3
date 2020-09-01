@@ -2,33 +2,25 @@ import QtQuick 2.12
 
 Item {
     id: root
-    GridView.onRemove: SequentialAnimation {
-            PropertyAction { target: root; property: "GridView.delayRemove"; value: true }
-            NumberAnimation { target: root; property: "scale"; to: 0; duration: 1000; easing.type: Easing.InElastic }
-            PropertyAction { target: root; property: "GridView.delayRemove"; value: false }
-            ScriptAction { script: colapse() }
-            NumberAnimation { target: root; property: "opacity"; to: 0; duration: 200}
-
-            ScriptAction { script: remove() }
-    }
-
-    required property color display
-    required property int index
-    required property Item dragParent
+    property color colorDelegate
+    property int position
+    property Item dragParent
     signal move(int from, int to)
     signal remove()
-    signal colapse()
+    signal collapse()
+    signal score()
     DropArea {
         id: _dropArea
-        property color display : root.display
-        property int index : root.index
+        property color display : root.colorDelegate
+        property int index : root.position
         property Item dragParent : root.dragParent
 
         onDropped: function(drop){
             remove()
         }
+
         onEntered: function(drag){
-        var from = (drag.source as Rectangle).visualIndex
+            var from = (drag.source as Rectangle).visualIndex
             var to = _bubble.visualIndex
             move(from, to)
         }
@@ -75,5 +67,17 @@ Item {
             ]
 
         }
+
+    }
+    GridView.onRemove: SequentialAnimation {
+        id: animation
+        alwaysRunToEnd: true
+        PropertyAction { target: root; property: "GridView.delayRemove"; value: true }
+        NumberAnimation { target: root; property: "scale"; to: 0; duration: 700; easing.type: Easing.InElastic }
+        PropertyAction { target: root; property: "GridView.delayRemove"; value: false }
+        ScriptAction { script: score()}
+        ScriptAction { script: {collapse(); console.log("i`m done")} }
+        PauseAnimation {}
+        ScriptAction { script: {remove(); console.log("i`m not")} }
     }
 }

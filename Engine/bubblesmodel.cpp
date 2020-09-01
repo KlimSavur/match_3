@@ -125,13 +125,16 @@ void BubblesModel::applyMove(int from, int to){
     }
 }
 
-void BubblesModel::move(int from, int to)
+bool BubblesModel::move(int from, int to)
 {
     applyMove(from, to);
     if (simpleMatch() == QVector<int>({0, 0, 0})){
         applyMove(to, from);
+        return false;
     }
+    return true;
 }
+
 void BubblesModel::collapse(){
     if (m_collapse.count() >= 3){
         int j    = 0;
@@ -148,7 +151,6 @@ void BubblesModel::collapse(){
             for (int i = m_collapse.first(); i <= end; ++i){
                 from = i - m_columns - m_columns * j;
                 to = (m_collapse[1] - m_collapse[0] == 1) ? (i - m_columns * j) : (m_collapse.last());
-                qDebug() << "from " << from << " to " << to;
                 emit beginMoveRows(QModelIndex(), from , from, QModelIndex(),to + 1);
                 m_elements.move(from, to);
                 emit endMoveRows();

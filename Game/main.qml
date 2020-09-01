@@ -5,7 +5,7 @@ ApplicationWindow {
     id: _window
     property int cellHeightJSON: 0
     property int cellWidthJSON: 0
-    property int score: _gridView.score
+    property int columns: 0
     visible: true
     width: 480
     title: qsTr("Match 3")
@@ -14,7 +14,8 @@ ApplicationWindow {
 
     header: HeaderBar {
         id: _header
-        moves: parent.score
+        score: _gridView.score
+        moves: _gridView.moves
         onRestartPressed: _gridView.restart();
     }
 
@@ -23,6 +24,7 @@ ApplicationWindow {
         anchors.fill: parent
         cellWidth: cellWidthJSON
         cellHeight: cellHeightJSON
+        columns: _window.columns
     }
 
     Component.onCompleted: {
@@ -46,6 +48,7 @@ ApplicationWindow {
                 maximumWidth= width
                 minimumHeight= height
                 minimumWidth= width
+                columns = js.columns
                 cellWidthJSON = width / js.columns
             }
        }

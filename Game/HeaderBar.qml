@@ -8,7 +8,7 @@ ToolBar {
     signal restartPressed()
     height: 70
     background: Rectangle {
-        anchors.fill: parent
+        anchors.fill: root
         opacity: 0
     }
     Text {
@@ -24,7 +24,7 @@ ToolBar {
     }
     Text {
         anchors.right: parent.right
-        anchors.rightMargin: root.height
+        anchors.rightMargin: parent.height
         anchors.verticalCenter: parent.verticalCenter
         text: root.score
     }

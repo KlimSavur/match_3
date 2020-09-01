@@ -1,6 +1,6 @@
 {
-        "columns": 20,
-        "rows": 20,
+        "columns": 5,
+        "rows": 5,
 	"colors":["red", "green", "yellow", "blue"],
 	"_comment": "WHITE COLOR IS RESTRICTED"
 }	

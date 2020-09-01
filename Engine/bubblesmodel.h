@@ -16,7 +16,7 @@ public:
     int rowCount(const QModelIndex&) const override;
     QVariant data(const QModelIndex &index, int role) const override;
     Q_INVOKABLE void generateBoard();
-    Q_INVOKABLE void move(int from, int to);
+    Q_INVOKABLE bool move(int from, int to);
     Q_INVOKABLE void remove();
     Q_INVOKABLE void collapse();
 private:
