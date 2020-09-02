@@ -28,7 +28,6 @@ void BubblesModel::checkBoard()
         QColor old_color = m_elements[vec[1]];
         while ((m_elements[vec[1]] = randomColor()) == old_color) {;}
     }
-
 }
 
 QVector<int> BubblesModel::simpleMatch() const{

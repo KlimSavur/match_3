@@ -74,6 +74,6 @@ Item {
         PropertyAction { target: root; property: "GridView.delayRemove"; value: true }
         NumberAnimation { target: root; property: "scale"; to: 0; duration: 700; easing.type: Easing.InElastic }
         PropertyAction { target: root; property: "GridView.delayRemove"; value: false }
-        ScriptAction { script: {collapse();}}
+        ScriptAction { script: collapse();}
     }
 }

@@ -34,11 +34,9 @@ GridView {
             }
         }
     }
-    move: Transition{
-
+    move: Transition {
         enabled: false
     }
-
     onRestart: {
         _model.generateBoard()
         score = 0
