@@ -135,8 +135,10 @@ bool BubblesModel::move(int from, int to)
     return true;
 }
 
-void BubblesModel::collapse(){
+int BubblesModel::collapse(){
+    int res = 0;
     if (m_collapse.count() >= 3){
+        res = m_collapse.count();
         int j    = 0;
         int from = 0;
         int to   = 0;
@@ -150,7 +152,7 @@ void BubblesModel::collapse(){
         while (m_collapse.first() - m_columns * (j + 1) >= 0){
             for (int i = m_collapse.first(); i <= end; ++i){
                 from = i - m_columns - m_columns * j;
-                to = (m_collapse[1] - m_collapse[0] == 1) ? (i - m_columns * j) : (m_collapse.last());
+                to = (m_collapse[1] - m_collapse[0] == 1) ? (i - m_columns * j) : (m_collapse.last() - m_columns * j);
                 emit beginMoveRows(QModelIndex(), from , from, QModelIndex(),to + 1);
                 m_elements.move(from, to);
                 emit endMoveRows();
@@ -160,31 +162,34 @@ void BubblesModel::collapse(){
             }
             j++;
         }
-
     }
     m_collapse.clear();
+    remove();
+    return res;
 }
 
 
 void BubblesModel::remove(){
-if (simpleMatch() != QVector<int>({0, 0, 0})){
-    QVector<int> temp_vec = findMatch();
-    if (temp_vec[1] - temp_vec[0] == 1){
-         for (auto i = temp_vec.count() - 1; i >= 0; --i){
-             emit beginRemoveRows(QModelIndex(), temp_vec[i], temp_vec[i]);
-             m_elements.remove(temp_vec[i]);
-             emit endRemoveRows();
+    if (simpleMatch() != QVector<int>({0, 0, 0})){
+        QVector<int> temp_vec = findMatch();
+        emit beginResetModel();
+        emit endResetModel();
+        if (temp_vec[1] - temp_vec[0] == 1){
+             for (auto i = temp_vec.count() - 1; i >= 0; --i){
+                 emit beginRemoveRows(QModelIndex(), temp_vec[i], temp_vec[i]);
+                 m_elements.remove(temp_vec[i]);
+                 emit endRemoveRows();
+            }
         }
-    }
-    else if (temp_vec[1] - temp_vec[0] == m_columns){
-        for (auto i = temp_vec.count() - 1; i >= 0; --i){
-            emit beginRemoveRows(QModelIndex(), temp_vec[i], temp_vec[i]);
-            m_elements.remove(temp_vec[i]);
-            emit endRemoveRows();
+        else if (temp_vec[1] - temp_vec[0] == m_columns){
+            for (auto i = temp_vec.count() - 1; i >= 0; --i){
+                emit beginRemoveRows(QModelIndex(), temp_vec[i], temp_vec[i]);
+                m_elements.remove(temp_vec[i]);
+                emit endRemoveRows();
+            }
         }
+        m_collapse = temp_vec;
     }
-    m_collapse = temp_vec;
-}
 }
 
 BubblesModel::BubblesModel(QObject *parent)

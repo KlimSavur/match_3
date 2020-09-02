@@ -8,7 +8,6 @@ Item {
     signal move(int from, int to)
     signal remove()
     signal collapse()
-    signal score()
     DropArea {
         id: _dropArea
         property color display : root.colorDelegate
@@ -75,9 +74,6 @@ Item {
         PropertyAction { target: root; property: "GridView.delayRemove"; value: true }
         NumberAnimation { target: root; property: "scale"; to: 0; duration: 700; easing.type: Easing.InElastic }
         PropertyAction { target: root; property: "GridView.delayRemove"; value: false }
-        ScriptAction { script: score()}
-        ScriptAction { script: {collapse(); console.log("i`m done")} }
-        PauseAnimation {}
-        ScriptAction { script: {remove(); console.log("i`m not")} }
+        ScriptAction { script: {collapse();}}
     }
 }

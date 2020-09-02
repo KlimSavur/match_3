@@ -18,7 +18,7 @@ public:
     Q_INVOKABLE void generateBoard();
     Q_INVOKABLE bool move(int from, int to);
     Q_INVOKABLE void remove();
-    Q_INVOKABLE void collapse();
+    Q_INVOKABLE int collapse();
 private:
     QVector<int> simpleMatch() const;
     void loadFromJSON();

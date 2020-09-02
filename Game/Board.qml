@@ -25,10 +25,7 @@ GridView {
             _model.remove();
         }
         onCollapse: {
-            _model.collapse()
-        }
-        onScore: {
-            root.score++
+            root.score += _model.collapse()
         }
         onMove: {
             var offset = to - from
@@ -36,6 +33,10 @@ GridView {
                 root.moves++
             }
         }
+    }
+    move: Transition{
+
+        enabled: false
     }
 
     onRestart: {

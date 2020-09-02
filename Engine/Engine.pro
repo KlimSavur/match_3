@@ -10,7 +10,6 @@ QML_XHR_ALLOW_FILE_READ=1
 # Input
 SOURCES += \
         bubblesmodel.cpp \
-        bubblesmodel_copy_old.cpp \
         engine_plugin.cpp
 
 HEADERS += \
