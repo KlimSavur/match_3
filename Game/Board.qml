@@ -5,7 +5,7 @@ GridView {
     id: root
     property int score: 0
     property int moves: 0
-    property int columns: 0
+    property int preesedIndex: -1
     signal restart()
     interactive: false
     clip: true
@@ -18,25 +18,29 @@ GridView {
         id: _bubble
         width: root.cellWidth - 2
         height: root.cellHeight - 2
-        dragParent: root
         colorDelegate: display
-        position: index
-        onRemove: {
-            _model.remove();
+        onSetIndex: {
+            root.preesedIndex = index
         }
         onCollapse: {
-            root.score += _model.collapse()
+
         }
+
         onMove: {
-            var offset = to - from
-            if ((_model.move(from, to)) && (Math.abs(offset) == 1 || Math.abs(offset) == columns)){
-                root.moves++
-            }
+            _model.move(root.preesedIndex, index)
+            root.preesedIndex = -1
         }
     }
+        GridView.delayRemove: true
     move: Transition {
-        enabled: false
+        SequentialAnimation{
+            NumberAnimation { properties: "x,y"; duration: 400; }
+            ScriptAction { script:  _model.add()}
+            ScriptAction { script:  _model.update()}
+        }
     }
+
+
     onRestart: {
         _model.generateBoard()
         score = 0

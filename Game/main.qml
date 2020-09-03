@@ -5,7 +5,6 @@ ApplicationWindow {
     id: _window
     property int cellHeightJSON: 0
     property int cellWidthJSON: 0
-    property int columns: 0
     visible: true
     width: 480
     title: qsTr("Match 3")
@@ -24,7 +23,6 @@ ApplicationWindow {
         anchors.fill: parent
         cellWidth: cellWidthJSON
         cellHeight: cellHeightJSON
-        columns: _window.columns
     }
 
     Component.onCompleted: {
@@ -48,7 +46,6 @@ ApplicationWindow {
                 maximumWidth= width
                 minimumHeight= height
                 minimumWidth= width
-                columns = js.columns
                 cellWidthJSON = width / js.columns
             }
        }

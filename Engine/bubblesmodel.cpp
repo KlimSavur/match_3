@@ -53,6 +53,23 @@ QVector<int> BubblesModel::simpleMatch() const{
     return QVector<int>({0, 0, 0});
 }
 
+void BubblesModel::generateBoard()
+{
+    emit beginResetModel();
+    m_elements.clear();
+    for (int i = 0 ; i < m_columns * m_rows; ++i) {
+        m_elements.push_back(randomColor());
+    }
+    checkBoard();
+    emit endResetModel();
+}
+
+
+/*
+    ***************
+    **NEED REVIEW**
+    ***************
+*/
 QVector<int> BubblesModel::findMatch() const
 {
     QVector<int> result = simpleMatch();
@@ -84,18 +101,23 @@ QVector<int> BubblesModel::findMatch() const
     return result;
 }
 
-void BubblesModel::generateBoard()
-{
-    emit beginResetModel();
-    m_elements.clear();
-    for (int i = 0 ; i < m_columns * m_rows; ++i) {
-        m_elements.push_back(randomColor());
+void BubblesModel::applyMove(int from, int to){
+    int offset = to - from;
+    if (abs(offset) == 1 || abs(offset) == m_columns){
+        emit beginMoveRows(QModelIndex(), from, from, QModelIndex(), to + ((offset > 0) ? 1 : 0));
+        m_elements.move(from, to);
+        emit endMoveRows();
     }
-    checkBoard();
-    emit endResetModel();
+    if (abs(offset) == m_columns){
+        emit beginMoveRows(QModelIndex(), to + ((offset < 0) ? 1 : -1) , to + ((offset < 0) ? 1 : -1), QModelIndex(), from + ((offset < 0) ? 1 : 0));
+        m_elements.move(to + ((offset < 0) ? 1 : -1), from);
+        emit endMoveRows();
+    }
 }
 
-void BubblesModel::applyMove(int from, int to){
+void BubblesModel::move(int from, int to)
+{
+    static bool moveBack = true;
     int offset = to - from;
     if (from < 0|| from >= m_elements.count()){
         return;
@@ -112,41 +134,31 @@ void BubblesModel::applyMove(int from, int to){
     if ((offset == -1) && (from % m_columns == 0)){
         return;
     }
-    if (abs(offset) == 1 || abs(offset) == m_columns){
-        emit beginMoveRows(QModelIndex(), from, from, QModelIndex(), to + ((offset > 0) ? 1 : 0));
-        m_elements.move(from, to);
-        emit endMoveRows();
-    }
-    if (abs(offset) == m_columns){
-        emit beginMoveRows(QModelIndex(), to + ((offset < 0) ? 1 : -1) , to + ((offset < 0) ? 1 : -1), QModelIndex(), from + ((offset < 0) ? 1 : 0));
-        m_elements.move(to + ((offset < 0) ? 1 : -1), from);
-        emit endMoveRows();
-    }
-}
-
-bool BubblesModel::move(int from, int to)
-{
     applyMove(from, to);
-    if (simpleMatch() == QVector<int>({0, 0, 0})){
-        applyMove(to, from);
-        return false;
+    if ((simpleMatch() != QVector<int>({0, 0, 0})) ){
+        remove();
     }
-    return true;
+    else{
+        if (moveBack){
+            moveBack = false;
+            applyMove(to, from);
+            moveBack = true;
+        }
+    }
 }
 
-int BubblesModel::collapse(){
-    int res = 0;
+
+/*
+    ***************
+    **NEED REVIEW**
+    ***************
+*/
+void BubblesModel::collapse(){
     if (m_collapse.count() >= 3){
-        res = m_collapse.count();
         int j    = 0;
         int from = 0;
         int to   = 0;
         int end  = 0;
-        for(const auto& c : m_collapse){
-            emit beginInsertRows(QModelIndex(), c, c);
-            m_elements.insert(c, randomColor());
-            emit endInsertRows();
-        }
         end = (m_collapse[1] - m_collapse[0] == 1) ? (m_collapse.last()) : (m_collapse.first());
         while (m_collapse.first() - m_columns * (j + 1) >= 0){
             for (int i = m_collapse.first(); i <= end; ++i){
@@ -163,33 +175,55 @@ int BubblesModel::collapse(){
         }
     }
     m_collapse.clear();
-    remove();
-    return res;
 }
 
+void BubblesModel::add()
+{
+    if (m_add.count() >= 3){
+        qDebug() << m_add;
+        if ((m_add[1] - m_add[0]) == 1){
+            for (auto c: m_add){
+                m_elements.remove(c % m_columns);
+    //            update();
+                emit beginInsertRows(QModelIndex(), c % m_columns, c % m_columns);
+                m_elements.insert(c % m_columns, randomColor());
+                emit endInsertRows();
+            }
+        }
+        m_add.clear();
+//        update();
+    }
+    m_add.clear();
+}
+
+void BubblesModel::update()
+{
+    emit beginResetModel();
+    emit endResetModel();
+    collapse();
+    if ((m_add.last() / m_columns) < 1){
+        add();
+    }
+}
 
 void BubblesModel::remove(){
     if (simpleMatch() != QVector<int>({0, 0, 0})){
+        QColor trans;
+        update();
+        trans.setAlpha(0);
         QVector<int> temp_vec = findMatch();
-        emit beginResetModel();
-        emit endResetModel();
-        if (temp_vec[1] - temp_vec[0] == 1){
+        if ((temp_vec[1] - temp_vec[0] == 1) || (temp_vec[1] - temp_vec[0] == m_columns)){
              for (auto i = temp_vec.count() - 1; i >= 0; --i){
                  emit beginRemoveRows(QModelIndex(), temp_vec[i], temp_vec[i]);
-                 m_elements.remove(temp_vec[i]);
+                 m_elements[temp_vec[i]] = trans;
                  emit endRemoveRows();
             }
         }
-        else if (temp_vec[1] - temp_vec[0] == m_columns){
-            for (auto i = temp_vec.count() - 1; i >= 0; --i){
-                emit beginRemoveRows(QModelIndex(), temp_vec[i], temp_vec[i]);
-                m_elements.remove(temp_vec[i]);
-                emit endRemoveRows();
-            }
-        }
+        m_add = temp_vec;
         m_collapse = temp_vec;
     }
 }
+
 
 BubblesModel::BubblesModel(QObject *parent)
     : QAbstractListModel(parent)

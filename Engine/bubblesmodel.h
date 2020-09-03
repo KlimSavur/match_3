@@ -16,9 +16,11 @@ public:
     int rowCount(const QModelIndex&) const override;
     QVariant data(const QModelIndex &index, int role) const override;
     Q_INVOKABLE void generateBoard();
-    Q_INVOKABLE bool move(int from, int to);
+    Q_INVOKABLE void move(int from, int to);
     Q_INVOKABLE void remove();
-    Q_INVOKABLE int collapse();
+    Q_INVOKABLE void collapse();
+    Q_INVOKABLE void add();
+    Q_INVOKABLE void update();
 private:
     QVector<int> simpleMatch() const;
     void loadFromJSON();
@@ -31,4 +33,6 @@ private:
     ushort m_rows;
     ushort m_columns;
     QVector<int> m_collapse;
+    QVector<int> m_add;
+
 };

@@ -1,79 +1,57 @@
 import QtQuick 2.12
 
-Item {
+Rectangle {
     id: root
     property color colorDelegate
-    property int position
-    property Item dragParent
-    signal move(int from, int to)
+    signal move()
     signal remove()
+    signal setIndex()
+    signal deleteIndex()
     signal collapse()
-    DropArea {
-        id: _dropArea
-        property color display : root.colorDelegate
-        property int index : root.position
-        property Item dragParent : root.dragParent
-
-        onDropped: function(drop){
-            remove()
+    radius: Math.max(height, width) / 2
+    color: colorDelegate
+    border.color: Qt.darker(color)
+    border.width: 1
+    MouseArea{
+        anchors.fill: parent
+        hoverEnabled: enabled
+        onPressed: {
+            setIndex()
+            _pressAnimation.restart()
         }
-
-        onEntered: function(drag){
-            var from = (drag.source as Rectangle).visualIndex
-            var to = _bubble.visualIndex
-            move(from, to)
+        onReleased: {
+            _pressAnimation.restart()
         }
-
-        width: root.width
-        height: root.height
-
-        MouseArea {
-            id: _dragArea
-            anchors.fill: _bubble
-            drag.target: _bubble
-            onReleased: _bubble.Drag.drop()
+        onEntered: {
+            move()
         }
-
-        Rectangle {
-            id: _bubble
-            property Item dragParent: _dropArea.dragParent
-            property int visualIndex: _dropArea.index
-            radius: Math.max(height, width) / 2
-            border.color: Qt.darker(color)
-            border.width: 1
-            width: _dropArea.height
-            height: _dropArea.width
-            color: _dropArea.display
-            Drag.active: _dragArea.drag.active
-            Drag.source: _bubble
-            Drag.hotSpot.x: width / 2
-            Drag.hotSpot.y: height / 2
-
-            gradient: Gradient {
-                orientation: Gradient.Horizontal
-                GradientStop { position: 0.0; color: _bubble.color }
-                GradientStop { position: 0.5; color: Qt.lighter(_bubble.color)}
-            }
-
-            states: [
-                State {
-                    when: _dragArea.drag.active
-                    ParentChange {
-                        target: _bubble
-                        parent: _bubble.dragParent
-                    }
-                }
-            ]
-
-        }
-
     }
+    NumberAnimation {
+        id: _pressAnimation
+        target: root;
+        property: "scale";
+        to: (scale === 0.9) ? (1) : (0.9)
+        duration: 100
+    }
+    gradient: Gradient {
+        orientation: Gradient.Horizontal
+        GradientStop { position: 0.0; color: _bubble.color }
+        GradientStop { position: 0.5; color: Qt.lighter(_bubble.color)}
+    }
+
     GridView.onRemove: SequentialAnimation {
         id: animation
         alwaysRunToEnd: true
         PropertyAction { target: root; property: "GridView.delayRemove"; value: true }
         NumberAnimation { target: root; property: "scale"; to: 0; duration: 700; easing.type: Easing.InElastic }
         PropertyAction { target: root; property: "GridView.delayRemove"; value: false }
-        ScriptAction { script: collapse();}
+        ScriptAction { script: _model.update()}
+    }
+    GridView.onAdd: SequentialAnimation {
+        id: animation1
+        alwaysRunToEnd: true
+        NumberAnimation {target: root; property: "scale"; from: 0; to: 1; duration: 400}
+        ScriptAction {script:  _model.update()}
+
     }
 }
