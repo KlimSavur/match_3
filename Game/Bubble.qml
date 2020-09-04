@@ -5,9 +5,7 @@ Rectangle {
     property color colorDelegate
     signal move()
     signal remove()
-    signal setIndex()
-    signal deleteIndex()
-    signal collapse()
+    signal setIndex(int pos)
     radius: Math.max(height, width) / 2
     color: colorDelegate
     border.color: Qt.darker(color)
@@ -16,12 +14,15 @@ Rectangle {
         anchors.fill: parent
         onPressed: {
             if (containsMouse()) {
-                setIndex()
+                setIndex(0)
                 _pressAnimation.restart()
             }
         }
         onReleased: {
             _releaseAnimation.restart()
+            if (containsMouse()){
+                setIndex(-1)
+            }
         }
         onEntered: {
             move()
@@ -51,13 +52,14 @@ Rectangle {
         id: animation
         alwaysRunToEnd: true
         PropertyAction { target: root; property: "GridView.delayRemove"; value: true }
-        NumberAnimation { target: root; property: "scale"; to: 0; duration: 700; easing.type: Easing.InElastic }
+        NumberAnimation { target: root; property: "scale"; to: 0; duration: 1000; easing.type: Easing.InElastic }
         PropertyAction { target: root; property: "GridView.delayRemove"; value: false }
+        ScriptAction { script: remove()}
+
     }
     GridView.onAdd: SequentialAnimation {
         id: animation1
         alwaysRunToEnd: true
-        NumberAnimation {target: root; property: "y"; from: -300; to: y; duration: 400}
-//        ScriptAction { script: _gridView.moved = true}
+        NumberAnimation {target: root; property: "y"; from: -300; to: y; duration: 1000}
     }
 }

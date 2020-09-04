@@ -21,30 +21,23 @@ GridView {
         height: root.cellHeight - 2
         colorDelegate: display
         onSetIndex: {
-            root.preesedIndex = index
+            root.preesedIndex = (pos === 0) ? index : -1
         }
-        onCollapse: {
-
-        }
-
         onMove: {
             _model.move(root.preesedIndex, index)
             root.preesedIndex = -1
         }
+        onRemove: {
+            _model.remove()
+        }
     }
-        GridView.delayRemove: true
+
+
     move: Transition {
         SequentialAnimation{
             id: _anim
             NumberAnimation { properties: "x,y"; duration: 1000; }
-            ScriptAction {
-                script: {
-                    if (root.moved){
-                        _model.remove();
-                        root.moved = false
-                    }
-                }
-            }
+
         }
     }
 
