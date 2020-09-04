@@ -97,6 +97,42 @@ QVector<int> BubblesModel::findMatch() const
                 counter += m_columns;
             }
         }
+        for (auto c: result){
+            if ((c - 2 * m_columns) < 0) return result;
+            if ((c + 2 * m_columns) >= m_elements.count()) return result;
+            if ((m_elements[c] == m_elements[c - m_columns]) && (m_elements[c] == m_elements[c - 2*m_columns]) ) {
+                result.push_back(c - m_columns);
+                result.push_back(c - 2 * m_columns);
+                counter = c - 2 * m_columns;
+                while ((counter -= m_columns) >= 0){
+                    if (m_elements[0] == m_elements[counter]){
+                        result.push_back(counter);
+                    }
+                    else{
+                        counter = -1;
+                    }
+                }
+            }
+            if ((m_elements[c] == m_elements[c + m_columns]) && (m_elements[c] == m_elements[c + 2*m_columns]) ) {
+                result.push_back(c + m_columns);
+                result.push_back(c + 2 * m_columns);
+                counter = c + 2 * m_columns;
+                while ((counter += m_columns) < m_elements.count()){
+                    if (m_elements[0] == m_elements[counter]){
+                        result.push_back(counter);
+                    }
+                    else{
+                        counter = m_elements.count();
+                    }
+                }
+            }
+            if ((c - m_columns >= 0) &&(c + m_columns < m_elements.count())){
+                if ((m_elements[c] == m_elements[c + m_columns]) && (m_elements[c] == m_elements[c - m_columns]) ) {
+                    result.push_back(c + m_columns);
+                    result.push_back(c - m_columns);
+                }
+            }
+        }
     }
     return result;
 }
@@ -115,36 +151,30 @@ void BubblesModel::applyMove(int from, int to){
     }
 }
 
-void BubblesModel::move(int from, int to)
+bool BubblesModel::move(int from, int to)
 {
-    static bool moveBack = true;
     int offset = to - from;
     if (from < 0|| from >= m_elements.count()){
-        return;
+        return false;
     }
     if (to < 0|| to >= m_elements.count()){
-        return;
+        return false;
     }
     if (from == to){
-        return;
+        return false;
     }
     if ((offset == 1) && (to % m_columns == 0)){
-        return;
+        return false;
     }
     if ((offset == -1) && (from % m_columns == 0)){
-        return;
+        return false;
     }
-    applyMove(from, to);
-    if ((simpleMatch() != QVector<int>({0, 0, 0})) ){
-        remove();
+    applyMove(from,to);
+    if (simpleMatch() != QVector<int>({0, 0, 0})){
+        return true;
     }
-    else{
-        if (moveBack){
-            moveBack = false;
-            applyMove(to, from);
-            moveBack = true;
-        }
-    }
+    applyMove(to, from);
+    return false;
 }
 
 
@@ -153,74 +183,26 @@ void BubblesModel::move(int from, int to)
     **NEED REVIEW**
     ***************
 */
-void BubblesModel::collapse(){
-    if (m_collapse.count() >= 3){
-        int j    = 0;
-        int from = 0;
-        int to   = 0;
-        int end  = 0;
-        end = (m_collapse[1] - m_collapse[0] == 1) ? (m_collapse.last()) : (m_collapse.first());
-        while (m_collapse.first() - m_columns * (j + 1) >= 0){
-            for (int i = m_collapse.first(); i <= end; ++i){
-                from = i - m_columns - m_columns * j;
-                to = (m_collapse[1] - m_collapse[0] == 1) ? (i - m_columns * j) : (m_collapse.last() - m_columns * j);
-                emit beginMoveRows(QModelIndex(), from , from, QModelIndex(),to + 1);
-                m_elements.move(from, to);
-                emit endMoveRows();
-                emit beginMoveRows(QModelIndex(), to - 1 , to - 1, QModelIndex(), from);
-                m_elements.move(to - 1, from);
-                emit endMoveRows();
-            }
-            j++;
-        }
-    }
-    m_collapse.clear();
-}
-
-void BubblesModel::add()
-{
-    if (m_add.count() >= 3){
-        qDebug() << m_add;
-        if ((m_add[1] - m_add[0]) == 1){
-            for (auto c: m_add){
-                m_elements.remove(c % m_columns);
-    //            update();
-                emit beginInsertRows(QModelIndex(), c % m_columns, c % m_columns);
-                m_elements.insert(c % m_columns, randomColor());
-                emit endInsertRows();
-            }
-        }
-        m_add.clear();
-//        update();
-    }
-    m_add.clear();
-}
-
-void BubblesModel::update()
-{
-    emit beginResetModel();
-    emit endResetModel();
-    collapse();
-    if ((m_add.last() / m_columns) < 1){
-        add();
-    }
-}
 
 void BubblesModel::remove(){
     if (simpleMatch() != QVector<int>({0, 0, 0})){
-        QColor trans;
-        update();
-        trans.setAlpha(0);
         QVector<int> temp_vec = findMatch();
         if ((temp_vec[1] - temp_vec[0] == 1) || (temp_vec[1] - temp_vec[0] == m_columns)){
-             for (auto i = temp_vec.count() - 1; i >= 0; --i){
+             for (auto i = 0; i <= temp_vec.count() - 1; ++i){
                  emit beginRemoveRows(QModelIndex(), temp_vec[i], temp_vec[i]);
-                 m_elements[temp_vec[i]] = trans;
+                 m_elements.remove(temp_vec[i]);
                  emit endRemoveRows();
+                 emit beginInsertRows(QModelIndex(), temp_vec[i] % m_columns, temp_vec[i] % m_columns);
+                 m_elements.insert(temp_vec[i] % m_columns, randomColor());
+                 emit endInsertRows();
+                 for(int j = temp_vec[i] % m_columns + 1; j  < temp_vec[i]; j += m_columns){
+                     qDebug() << "from " << j << " to " << j + m_columns -1 ;
+                     emit beginMoveRows(QModelIndex(), j, j, QModelIndex(), j + m_columns);
+                     m_elements.move(j, j + m_columns - 1);
+                     emit endMoveRows();
+                 }
             }
         }
-        m_add = temp_vec;
-        m_collapse = temp_vec;
     }
 }
 
@@ -244,11 +226,11 @@ int BubblesModel::rowCount(const QModelIndex &) const
 QVariant BubblesModel::data(const QModelIndex &index, int role) const
 {
     int row = index.row();
-        if (row < 0 || row >= m_elements.count()){
-            return QVariant();
-        }
-        if (role == Qt::DisplayRole){
-            return m_elements[row];
-        }
+    if (row < 0 || row >= m_elements.count()){
         return QVariant();
+    }
+    if (role == Qt::DisplayRole){
+        return m_elements[row];
+    }
+    return QVariant();
 }

@@ -6,5 +6,6 @@
         <file>../cfg.json</file>
         <file>WindowBG.qml</file>
         <file>HeaderBar.qml</file>
+        <file>RoundMouseArea.qml</file>
     </qresource>
 </RCC>

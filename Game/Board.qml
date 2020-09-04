@@ -6,6 +6,7 @@ GridView {
     property int score: 0
     property int moves: 0
     property int preesedIndex: -1
+    property bool moved: true
     signal restart()
     interactive: false
     clip: true
@@ -34,10 +35,28 @@ GridView {
         GridView.delayRemove: true
     move: Transition {
         SequentialAnimation{
-            NumberAnimation { properties: "x,y"; duration: 400; }
-            ScriptAction { script:  _model.add()}
-            ScriptAction { script:  _model.update()}
+            id: _anim
+            NumberAnimation { properties: "x,y"; duration: 1000; }
+            ScriptAction {
+                script: {
+                    if (root.moved){
+                        _model.remove();
+                        root.moved = false
+                    }
+                }
+            }
         }
+    }
+
+    addDisplaced: Transition{
+        enabled: false
+    }
+
+    removeDisplaced: Transition {
+        enabled: false
+    }
+    displaced: Transition{
+        enabled: false
     }
 
 

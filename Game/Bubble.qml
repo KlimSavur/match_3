@@ -12,15 +12,16 @@ Rectangle {
     color: colorDelegate
     border.color: Qt.darker(color)
     border.width: 1
-    MouseArea{
+    RoundMouseArea{
         anchors.fill: parent
-        hoverEnabled: enabled
         onPressed: {
-            setIndex()
-            _pressAnimation.restart()
+            if (containsMouse()) {
+                setIndex()
+                _pressAnimation.restart()
+            }
         }
         onReleased: {
-            _pressAnimation.restart()
+            _releaseAnimation.restart()
         }
         onEntered: {
             move()
@@ -30,7 +31,14 @@ Rectangle {
         id: _pressAnimation
         target: root;
         property: "scale";
-        to: (scale === 0.9) ? (1) : (0.9)
+        to: 0.9
+        duration: 100
+    }
+    NumberAnimation {
+        id: _releaseAnimation
+        target: root;
+        property: "scale";
+        to: 1
         duration: 100
     }
     gradient: Gradient {
@@ -45,13 +53,11 @@ Rectangle {
         PropertyAction { target: root; property: "GridView.delayRemove"; value: true }
         NumberAnimation { target: root; property: "scale"; to: 0; duration: 700; easing.type: Easing.InElastic }
         PropertyAction { target: root; property: "GridView.delayRemove"; value: false }
-        ScriptAction { script: _model.update()}
     }
     GridView.onAdd: SequentialAnimation {
         id: animation1
         alwaysRunToEnd: true
-        NumberAnimation {target: root; property: "scale"; from: 0; to: 1; duration: 400}
-        ScriptAction {script:  _model.update()}
-
+        NumberAnimation {target: root; property: "y"; from: -300; to: y; duration: 400}
+//        ScriptAction { script: _gridView.moved = true}
     }
 }
