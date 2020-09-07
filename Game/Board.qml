@@ -13,6 +13,9 @@ GridView {
 
     model: BubblesModel {
         id: _model
+        onCScoreChanged: {
+            root.score = cScore
+        }
     }
 
     delegate: Bubble {
@@ -24,38 +27,39 @@ GridView {
             root.preesedIndex = (pos === 0) ? index : -1
         }
         onMove: {
-            _model.move(root.preesedIndex, index)
+            if (_model.move(root.preesedIndex, index))
+                moves++;
             root.preesedIndex = -1
-        }
-        onRemove: {
-            _model.remove()
         }
     }
 
 
     move: Transition {
-        SequentialAnimation{
-            id: _anim
-            NumberAnimation { properties: "x,y"; duration: 1000; }
-
+        NumberAnimation { properties: "x,y"; duration: 1000}
+        onRunningChanged: {
+            if (!running)
+                _model.moveCompleted()
         }
     }
 
-    addDisplaced: Transition{
-        enabled: false
+    remove: Transition {
+        SequentialAnimation {
+            PropertyAction { property: "GridView.delayRemove"; value: true }
+            NumberAnimation { property: "scale"; to: 0; duration: 600; easing.type: Easing.InElastic }
+            PropertyAction { property: "GridView.delayRemove"; value: false }
+            ScriptAction { script: _model.moveCompleted() }
+        }
     }
-
-    removeDisplaced: Transition {
-        enabled: false
+    add: Transition {
+        SequentialAnimation {
+            NumberAnimation { property: "y"; from: -cellHeight; to: y; duration: 800}
+        }
     }
-    displaced: Transition{
-        enabled: false
-    }
-
 
     onRestart: {
         _model.generateBoard()
         score = 0
+        _model.cScore = 0
         moves = 0
     }
 }

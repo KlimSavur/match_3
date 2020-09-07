@@ -4,7 +4,6 @@ Rectangle {
     id: root
     property color colorDelegate
     signal move()
-    signal remove()
     signal setIndex(int pos)
     radius: Math.max(height, width) / 2
     color: colorDelegate
@@ -48,18 +47,5 @@ Rectangle {
         GradientStop { position: 0.5; color: Qt.lighter(_bubble.color)}
     }
 
-    GridView.onRemove: SequentialAnimation {
-        id: animation
-        alwaysRunToEnd: true
-        PropertyAction { target: root; property: "GridView.delayRemove"; value: true }
-        NumberAnimation { target: root; property: "scale"; to: 0; duration: 1000; easing.type: Easing.InElastic }
-        PropertyAction { target: root; property: "GridView.delayRemove"; value: false }
-        ScriptAction { script: remove()}
 
-    }
-    GridView.onAdd: SequentialAnimation {
-        id: animation1
-        alwaysRunToEnd: true
-        NumberAnimation {target: root; property: "y"; from: -300; to: y; duration: 1000}
-    }
 }

@@ -1,4 +1,4 @@
-#include "bubblesmodel.h"
+﻿#include "bubblesmodel.h"
 
 void BubblesModel::loadFromJSON()
 {
@@ -94,7 +94,7 @@ QVector<int> BubblesModel::findMatch() const
         for (auto c: result){
             if ((c - 2 * m_columns) < 0) return result;
             if ((c + 2 * m_columns) >= m_elements.count()) return result;
-            if ((m_elements[c] == m_elements[c - m_columns]) && (m_elements[c] == m_elements[c - 2*m_columns]) ) {
+            if ((m_elements[c] == m_elements[c - m_columns]) && (m_elements[c] == m_elements[c - 2 * m_columns]) ) {
                 result.push_back(c - m_columns);
                 result.push_back(c - 2 * m_columns);
                 counter = c - 2 * m_columns;
@@ -107,7 +107,7 @@ QVector<int> BubblesModel::findMatch() const
                     }
                 }
             }
-            if ((m_elements[c] == m_elements[c + m_columns]) && (m_elements[c] == m_elements[c + 2*m_columns]) ) {
+            if ((m_elements[c] == m_elements[c + m_columns]) && (m_elements[c] == m_elements[c + 2 * m_columns]) ) {
                 result.push_back(c + m_columns);
                 result.push_back(c + 2 * m_columns);
                 counter = c + 2 * m_columns;
@@ -145,6 +145,22 @@ void BubblesModel::applyMove(int from, int to){
     }
 }
 
+bool BubblesModel::isLoss()
+{
+    int index = 0;
+    QVector<QColor> copy = m_elements;
+    if (simpleMatch() == QVector<int>({0, 0, 0})){
+        for (int i = 0; i < m_rows; ++i){
+            for (int j = 0; j < m_columns; ++i){
+                index = i*m_columns + j;
+            }
+
+        }
+        return true;
+    }
+    return false;
+}
+
 bool BubblesModel::move(int from, int to)
 {
     int offset = to - from;
@@ -165,8 +181,6 @@ bool BubblesModel::move(int from, int to)
     }
     applyMove(from,to);
     if (simpleMatch() != QVector<int>({0, 0, 0})){
-        qDebug() << "hui";
-        remove();
         return true;
     }
     applyMove(to, from);
@@ -184,27 +198,52 @@ void BubblesModel::remove(){
     if (simpleMatch() != QVector<int>({0, 0, 0})){
         QVector<int> temp_vec = findMatch();
         if ((temp_vec[1] - temp_vec[0] == 1) || (temp_vec[1] - temp_vec[0] == m_columns)){
-             for (auto i =  0; i <= temp_vec.count() - 1; ++i){
-                 emit beginRemoveRows(QModelIndex(), temp_vec[i], temp_vec[i]);
-                 m_elements.remove(temp_vec[i]);
-                 emit endRemoveRows();
-                 emit beginInsertRows(QModelIndex(), temp_vec[i] % m_columns, temp_vec[i] % m_columns);
-                 m_elements.insert(temp_vec[i] % m_columns, randomColor());
-                 emit endInsertRows();
-                 for(int j = temp_vec[i] % m_columns + 1; j  < temp_vec[i]; j += m_columns){
-                     emit beginMoveRows(QModelIndex(), j, j, QModelIndex(), j + m_columns);
-                     m_elements.move(j, j + m_columns - 1);
-                     emit endMoveRows();
-                 }
+            for (auto i =  0; i <= temp_vec.count() - 1; ++i){
+                emit beginRemoveRows(QModelIndex(), temp_vec[i], temp_vec[i]);
+                m_elements.remove(temp_vec[i]);
+                emit endRemoveRows();
+                emit beginInsertRows(QModelIndex(), temp_vec[i] % m_columns, temp_vec[i] % m_columns);
+                m_elements.insert(temp_vec[i] % m_columns, randomColor());
+                emit endInsertRows();
+                for(int j = temp_vec[i] % m_columns + 1; j  <= temp_vec[i]; j += m_columns){
+                    emit beginMoveRows(QModelIndex(), j, j, QModelIndex(), j + m_columns);
+                    m_elements.move(j, j + m_columns - 1);
+                    emit endMoveRows();
+                }
             }
+            m_cScore += (temp_vec.count()*10);
+            emit cScoreChanged();
         }
     }
+    if (isLoss()){
+        qDebug() << "YOU LOSS";
+    }
+}
+
+void BubblesModel::moveCompleted()
+{
+    if (m_elements.count() == m_rows*m_columns)
+        remove();
+}
+
+void BubblesModel::setCScore(const int &val)
+{
+    if (val != m_cScore){
+        m_cScore = val;
+        emit cScoreChanged();
+    }
+}
+
+int BubblesModel::cScore() const
+{
+    return m_cScore;
 }
 
 
 BubblesModel::BubblesModel(QObject *parent)
     : QAbstractListModel(parent)
 {
+    m_cScore = 0;
     loadFromJSON();
     generateBoard();
 }
