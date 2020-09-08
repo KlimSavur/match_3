@@ -34,25 +34,39 @@ GridView {
     }
 
     move: Transition {
-        NumberAnimation { easing.type: Easing.InBack; properties: "x,y"; duration: 800}
+        SequentialAnimation{
+            alwaysRunToEnd: true
+            NumberAnimation { easing.type: Easing.InBack; properties: "x,y"; duration: 600}
+        }
         onRunningChanged: {
-            if (!running)
-                _model.moveCompleted()
+            if (!running && moved){
+                moved = false;
+                _model.checkMatch()
+            }
+
         }
     }
 
     remove: Transition {
         SequentialAnimation {
+            alwaysRunToEnd: true
             PropertyAction { property: "GridView.delayRemove"; value: true }
             NumberAnimation { property: "scale"; to: 0; duration: 600; }
             PropertyAction { property: "GridView.delayRemove"; value: false }
+            ScriptAction { script: moved = true;}
         }
     }
     add: Transition {
-        SequentialAnimation {
-            NumberAnimation { easing.type: Easing.InBack; property: "y"; from: -cellHeight; duration: 800}
+        SequentialAnimation{
+            alwaysRunToEnd: true
+            NumberAnimation { easing.type: Easing.InBack; property: "y"; from: -cellHeight; duration: 600}
+            ScriptAction { script: moved = true;}
+        }
+        onRunningChanged: {
+            if (!running){
+                _model.checkMatch()
+            }
 
-//            ScriptAction { script: _model.moveCompleted() }
         }
     }
 
