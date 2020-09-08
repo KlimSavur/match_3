@@ -1,6 +1,6 @@
-import QtQuick 2.0
+import QtQuick 2.12
 
-MouseArea{
+MouseArea {
     id:root
     hoverEnabled: enabled
     function containsMouse() {

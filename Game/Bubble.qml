@@ -9,7 +9,7 @@ Rectangle {
     color: colorDelegate
     border.color: Qt.darker(color)
     border.width: 1
-    RoundMouseArea{
+    RoundMouseArea {
         anchors.fill: parent
         onPressed: {
             if (containsMouse()) {

@@ -1,6 +1,6 @@
 ﻿#include "bubblesmodel.h"
-static bool run = false;
 
+static bool run = false;
 
 void BubblesModel::loadFromJSON()
 {
@@ -44,10 +44,10 @@ QVector<int> BubblesModel::simpleMatch() const{
                     return QVector<int>({counter, counter + 1, counter + 2});
                 }
             }
-            if (counter + (2 * m_columns) < m_elements.count()){
+            if (counter + 2 * m_columns < m_elements.count()){
                 if ((m_elements[counter] == m_elements[counter + m_columns]) && \
-                        (m_elements[counter] == m_elements[counter + (2 * m_columns)])){
-                    return QVector<int>({counter, counter + m_columns, counter + (2 * m_columns)});
+                        (m_elements[counter] == m_elements[counter + 2 * m_columns])){
+                    return QVector<int>({counter, counter + m_columns, counter + 2 * m_columns});
                 }
             }
         }
@@ -75,7 +75,7 @@ int BubblesModel::setCell(int* matchColumns, int index, int matched) {
     }
     int res = 0;
     if (m_elements[index] == m_elements[index + 1]){
-        res = setCell(matchColumns,index + 1, matched + 1);
+        res = setCell(matchColumns, index + 1, matched + 1);
         matchColumns[index] = res;
         return res;
     }
@@ -259,11 +259,11 @@ bool BubblesModel::isLoss()
 
                 if (i - m_columns >= 0){
                     if (i % m_columns - 1 >= 0){
-                        if (m_elements[i] == m_elements[i - 1 - m_columns])
+                        if (m_elements[i] == m_elements[i - m_columns - 1])
                             return false;
                     }
                     if (i % m_columns + 1 < m_columns){
-                        if (m_elements[i] == m_elements[i + 1 - m_columns])
+                        if (m_elements[i] == m_elements[i - m_columns + 1])
                             return false;
                     }
                     if (i - 2 * m_columns  >= 0){
@@ -334,9 +334,9 @@ void BubblesModel::remove(QVector<int> temp_vec){
     }
     m_cScore += (temp_vec.count() * 10);
     emit cScoreChanged();
-    if (isLoss()){
-        emit openPopup();
-    }
+    if (simpleMatch() == QVector<int>({0, 0, 0}))
+        if (isLoss())
+            emit openPopup();
 }
 
 void BubblesModel::checkMatch(){

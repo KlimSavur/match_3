@@ -38,9 +38,9 @@ GridView {
     }
 
     move: Transition {
-        SequentialAnimation{
+        SequentialAnimation {
             alwaysRunToEnd: true
-            NumberAnimation { easing.type: Easing.InBack; properties: "x,y"; duration: 600}
+            NumberAnimation { easing.type: Easing.InBack; properties: "x,y"; duration: 600 }
         }
         onRunningChanged: {
             if (!running && moved){
@@ -55,16 +55,16 @@ GridView {
         SequentialAnimation {
             alwaysRunToEnd: true
             PropertyAction { property: "GridView.delayRemove"; value: true }
-            NumberAnimation { property: "scale"; to: 0; duration: 600; }
+            NumberAnimation { property: "scale"; to: 0; duration: 600 }
             PropertyAction { property: "GridView.delayRemove"; value: false }
-            ScriptAction { script: moved = true;}
+            ScriptAction { script: moved = true }
         }
     }
     add: Transition {
-        SequentialAnimation{
+        SequentialAnimation {
             alwaysRunToEnd: true
-            NumberAnimation { easing.type: Easing.InBack; property: "y"; from: -cellHeight; duration: 600}
-            ScriptAction { script: moved = true;}
+            NumberAnimation { easing.type: Easing.InBack; property: "y"; from: -cellHeight; duration: 600 }
+            ScriptAction { script: moved = true }
         }
         onRunningChanged: {
             if (!running){

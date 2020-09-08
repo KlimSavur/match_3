@@ -27,13 +27,13 @@ ApplicationWindow {
             _popup.open()
         }
     }
-    LossPopup{
+    LossPopup {
         id: _popup
+        anchors.centerIn: parent
         scroreVar: _gridView.score
         movesVar: _gridView.moves
-        width: _window.width/2
-        height: _window.height/2
-        anchors.centerIn: parent
+        width: _window.width / 2
+        height: _window.height / 2
         onPressed: {
             _gridView.restart()
         }
