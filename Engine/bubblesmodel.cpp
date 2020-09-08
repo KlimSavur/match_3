@@ -62,6 +62,8 @@ void BubblesModel::generateBoard()
     for (int i = 0 ; i < m_columns * m_rows; ++i) {
         m_elements.push_back(randomColor());
     }
+    while (isLoss())
+        generateBoard();
     checkBoard();
     emit endResetModel();
 }
@@ -85,36 +87,24 @@ int BubblesModel::setCell(int* matchColumns, int index, int matched) {
 }
 int BubblesModel::setCellRow(int* matchRows, int index, int matched) {
     if (index / m_columns >= m_rows - 1){
-        if (matchRows[index] != 0){
-            qDebug() << "ERROR";
-        }
         matchRows[index] = matched;
         return matched;
     }
     int res = 0;
     if (m_elements[index] == m_elements[index + m_columns]){
         res = setCellRow(matchRows, index + m_columns, matched + 1);
-        if (matchRows[index] != 0){
-            qDebug() << "ERROR";
-        }
         matchRows[index] = res;
         return res;
     }
     else {
         setCellRow(matchRows, index + m_columns, 1);
-        if (matchRows[index] != 0){
-            qDebug() << "ERROR";
-        }
         matchRows[index] = matched;
         return matched;
     }
 }
 void BubblesModel::findMatch()
 {
-    qDebug() << "called";
-
     if (simpleMatch() != QVector<int>({0, 0, 0}) && run){
-        qDebug() << "running";
         QVector<int> result;
         int *matchRows = new int[m_rows * m_columns];
         int *matchColumns = new int[m_rows * m_columns];
@@ -150,7 +140,6 @@ void BubblesModel::findMatch()
                 result.push_back(i);
             }
         }
-        qDebug() << result;
         remove(result);
         delete [] matchColumns;
         delete [] matchRows;
@@ -177,8 +166,129 @@ void BubblesModel::applyMove(int from, int to){
 
 bool BubblesModel::isLoss()
 {
+    int *matchRows = new int[m_rows * m_columns];
+    int *matchColumns = new int[m_rows * m_columns];
+    for (int i = 0; i < m_rows * m_columns; ++i){
+        matchRows[i] = 0;
+    }
+    for (int i = 0; i < m_rows * m_columns; ++i){
+        matchColumns[i] = 0;
+    }
 
-    return false;
+    for (int i = 0; i < m_rows * m_columns; ++i){
+        matchRows[i] = 0;
+        matchColumns[i] = 0;
+    }
+    for (int i = 0; i < m_rows * m_columns; i += m_columns){
+        if (m_elements[i] == m_elements[i + 1]){
+            matchColumns[i] = setCell(matchColumns, i, 1);
+        } else {
+            setCell(matchColumns, i, 1);
+            matchColumns[i] = 1;
+        }
+    }
+    for (int i = 0; i < m_columns; ++i){
+        if (m_elements[i] == m_elements[i + m_columns]){
+            matchRows[i] = setCellRow(matchRows, i, 1);
+        } else {
+            setCellRow(matchRows, i, 1);
+            matchRows[i] = 1;
+        }
+    }
+    for (int i = 0; i < m_rows * m_columns; i++){
+        if (matchColumns[i] == 2){
+            if (i % m_columns + 2 < m_columns){
+                if (i - m_columns >= 0){
+                    if (m_elements[i] == m_elements[i + 2 - m_columns])
+                        return false;
+                }
+                if (i + m_columns < m_columns * m_rows){
+                    if (m_elements[i] == m_elements[i + 2 + m_columns])
+                        return false;
+                }
+                if (i % m_columns + 3 < m_columns){
+                    if (m_elements[i] == m_elements[i + 3])
+                        return false;
+                }
+            }
+            if (i % m_columns - 1 >= 0){
+                if (i - m_columns >= 0){
+                    if (m_elements[i] == m_elements[i - 1 - m_columns])
+                        return false;
+                }
+                if (i + m_columns < m_columns * m_rows){
+                    if (m_elements[i] == m_elements[i - 1 + m_columns])
+                        return false;
+                }
+                if (i % m_columns - 2 >= 0){
+                    if (m_elements[i] == m_elements[i - 2])
+                        return false;
+                }
+            }
+            i += 2;
+        }
+        if (matchColumns[i] == 1){
+            if (i % m_columns + 2 < m_columns){
+                if (m_elements[i] == m_elements[i + 2]){
+                    if (i - m_columns >= 0){
+                        if (m_elements[i] == m_elements[i + 1 - m_columns])
+                            return false;
+                    }
+                    if (i + m_columns < m_columns * m_rows){
+                        if (m_elements[i] == m_elements[i + 1 + m_columns])
+                            return false;
+                    }
+                }
+            }
+        }
+    }
+    for (int i = 0; i < m_columns * m_rows; ++i){
+        if (matchRows[i] == 2){
+            if ((i + m_columns < m_columns * m_rows) && (matchRows[i + m_columns] == 2)){
+                if (i + 2 * m_columns < m_columns * m_rows){
+                    if (i % m_columns + 1 < m_columns )
+                        if (m_elements[i] == m_elements[i + 2 * m_columns + 1])
+                            return false;
+                    if (i % m_columns - 1 >= 0)
+                        if (m_elements[i] == m_elements[i + 2 * m_columns - 1])
+                            return false;
+                    if (i + 3 * m_columns < m_columns * m_rows)
+                        if (m_elements[i] == m_elements[i + 3 * m_columns])
+                            return false;
+                }
+
+                if (i - m_columns >= 0){
+                    if (i % m_columns - 1 >= 0){
+                        if (m_elements[i] == m_elements[i - 1 - m_columns])
+                            return false;
+                    }
+                    if (i % m_columns + 1 < m_columns){
+                        if (m_elements[i] == m_elements[i + 1 - m_columns])
+                            return false;
+                    }
+                    if (i - 2 * m_columns  >= 0){
+                        if (m_elements[i] == m_elements[i - 2 * m_columns])
+                            return false;
+                    }
+                }
+            }
+        }
+        if (matchRows[i] == 1){
+            if (i + 2 * m_columns < m_columns * m_rows){
+                if (m_elements[i] == m_elements[i + 2 * m_columns]){
+                    if (i % m_columns - 1 >= 0){
+                        if (m_elements[i] == m_elements[i + m_columns - 1])
+                            return false;
+                    }
+                    if (i % m_columns + 1 < m_columns){
+                        if (m_elements[i] == m_elements[i + m_columns + 1])
+                            return false;
+                    }
+                }
+            }
+        }
+    }
+    return true;
 }
 
 bool BubblesModel::move(int from, int to)
@@ -224,6 +334,9 @@ void BubblesModel::remove(QVector<int> temp_vec){
     }
     m_cScore += (temp_vec.count() * 10);
     emit cScoreChanged();
+    if (isLoss()){
+        emit openPopup();
+    }
 }
 
 void BubblesModel::checkMatch(){

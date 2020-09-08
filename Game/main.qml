@@ -23,6 +23,20 @@ ApplicationWindow {
         anchors.fill: parent
         cellWidth: cellWidthJSON
         cellHeight: cellHeightJSON
+        onOpenPopUp: {
+            _popup.open()
+        }
+    }
+    LossPopup{
+        id: _popup
+        scroreVar: _gridView.score
+        movesVar: _gridView.moves
+        width: _window.width/2
+        height: _window.height/2
+        anchors.centerIn: parent
+        onPressed: {
+            _gridView.restart()
+        }
     }
 
     Component.onCompleted: {

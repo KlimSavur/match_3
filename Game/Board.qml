@@ -8,6 +8,7 @@ GridView {
     property int preesedIndex: -1
     property bool moved: true
     signal restart()
+    signal openPopUp()
     interactive: false
     clip: true
 
@@ -15,6 +16,9 @@ GridView {
         id: _model
         onCScoreChanged: {
             root.score = cScore
+        }
+        onOpenPopup: {
+            openPopUp()
         }
     }
 

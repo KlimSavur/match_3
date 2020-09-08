@@ -23,6 +23,7 @@ public:
     int cScore() const;
 signals:
     void cScoreChanged();
+    void openPopup();
 private:
     QVector<int> simpleMatch() const;
     void loadFromJSON();

@@ -7,5 +7,6 @@
         <file>WindowBG.qml</file>
         <file>HeaderBar.qml</file>
         <file>RoundMouseArea.qml</file>
+        <file>LossPopup.qml</file>
     </qresource>
 </RCC>

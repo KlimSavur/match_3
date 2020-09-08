@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Please specify your qmake path here
-QMAKE_PATH="/opt/Qt/5.15.0/gcc_64/bin"
+QMAKE_PATH="/home/myownpc/Qt/5.15.0/gcc_64/bin"
 
 QMAKE_EXEC=$QMAKE_PATH/qmake
 BUILD_DIR=$PWD/build
