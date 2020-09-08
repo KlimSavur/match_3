@@ -33,9 +33,8 @@ GridView {
         }
     }
 
-
     move: Transition {
-        NumberAnimation { properties: "x,y"; duration: 1000}
+        NumberAnimation { easing.type: Easing.InBack; properties: "x,y"; duration: 800}
         onRunningChanged: {
             if (!running)
                 _model.moveCompleted()
@@ -45,14 +44,15 @@ GridView {
     remove: Transition {
         SequentialAnimation {
             PropertyAction { property: "GridView.delayRemove"; value: true }
-            NumberAnimation { property: "scale"; to: 0; duration: 600; easing.type: Easing.InElastic }
+            NumberAnimation { property: "scale"; to: 0; duration: 600; }
             PropertyAction { property: "GridView.delayRemove"; value: false }
-            ScriptAction { script: _model.moveCompleted() }
         }
     }
     add: Transition {
         SequentialAnimation {
-            NumberAnimation { property: "y"; from: -cellHeight; to: y; duration: 800}
+            NumberAnimation { easing.type: Easing.InBack; property: "y"; from: -cellHeight; duration: 800}
+
+//            ScriptAction { script: _model.moveCompleted() }
         }
     }
 

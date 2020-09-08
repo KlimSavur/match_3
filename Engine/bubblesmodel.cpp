@@ -147,17 +147,6 @@ void BubblesModel::applyMove(int from, int to){
 
 bool BubblesModel::isLoss()
 {
-    int index = 0;
-    QVector<QColor> copy = m_elements;
-    if (simpleMatch() == QVector<int>({0, 0, 0})){
-        for (int i = 0; i < m_rows; ++i){
-            for (int j = 0; j < m_columns; ++i){
-                index = i*m_columns + j;
-            }
-
-        }
-        return true;
-    }
     return false;
 }
 
@@ -197,6 +186,7 @@ bool BubblesModel::move(int from, int to)
 void BubblesModel::remove(){
     if (simpleMatch() != QVector<int>({0, 0, 0})){
         QVector<int> temp_vec = findMatch();
+        qDebug() << temp_vec;
         if ((temp_vec[1] - temp_vec[0] == 1) || (temp_vec[1] - temp_vec[0] == m_columns)){
             for (auto i =  0; i <= temp_vec.count() - 1; ++i){
                 emit beginRemoveRows(QModelIndex(), temp_vec[i], temp_vec[i]);
@@ -206,6 +196,7 @@ void BubblesModel::remove(){
                 m_elements.insert(temp_vec[i] % m_columns, randomColor());
                 emit endInsertRows();
                 for(int j = temp_vec[i] % m_columns + 1; j  <= temp_vec[i]; j += m_columns){
+                    if (j ==  temp_vec[i] % m_columns) continue;
                     emit beginMoveRows(QModelIndex(), j, j, QModelIndex(), j + m_columns);
                     m_elements.move(j, j + m_columns - 1);
                     emit endMoveRows();
