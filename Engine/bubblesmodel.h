@@ -5,7 +5,6 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QColor>
-#include <QRandomGenerator>
 
 class BubblesModel : public QAbstractListModel
 {
@@ -19,7 +18,7 @@ public:
     Q_INVOKABLE void generateBoard();
     Q_INVOKABLE bool move(int from, int to);
     Q_INVOKABLE void checkMatch();
-    void setCScore(const int&val);
+    void setCScore(int val);
     int cScore() const;
 signals:
     void cScoreChanged();
@@ -29,15 +28,16 @@ private:
     void loadFromJSON();
     void checkBoard();
     void findMatch();
-    void remove(QVector<int> temp_vec);
+    void remove(const QVector<int>& temp_vec);
     QColor randomColor() const;
     void applyMove(int from, int to);
     bool isLoss();
     int setCell(int* matchColumns, int index, int matched);
     int setCellRow(int* matchRows, int index, int matched);
+private:
     QList<QColor> m_avaliableColors;
     QVector<QColor> m_elements;
-    ushort m_rows;
-    ushort m_columns;
+    int m_rows;
+    int m_columns;
     int m_cScore;
 };

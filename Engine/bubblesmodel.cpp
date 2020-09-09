@@ -1,6 +1,5 @@
 ﻿#include "bubblesmodel.h"
-
-static bool run = false;
+#include <QRandomGenerator>
 
 void BubblesModel::loadFromJSON()
 {
@@ -11,7 +10,7 @@ void BubblesModel::loadFromJSON()
     text = file.readAll();
     file.close();
     QJsonDocument JSON_doc = QJsonDocument::fromJson(text.toUtf8());
-    for(const auto& i: JSON_doc["colors"].toArray()){
+    for(auto i: JSON_doc["colors"].toArray()){
          m_avaliableColors.push_back(QColor(i.toString()));
     }
     m_columns = JSON_doc["columns"].toInt();
@@ -28,7 +27,7 @@ void BubblesModel::checkBoard()
     QVector<int> vec;
     while((vec = simpleMatch()) != QVector<int>({0, 0, 0})){
         QColor old_color = m_elements[vec[1]];
-        while ((m_elements[vec[1]] = randomColor()) == old_color) {;}
+        while ((m_elements[vec[1]] = randomColor()) == old_color);
     }
 }
 
@@ -39,14 +38,12 @@ QVector<int> BubblesModel::simpleMatch() const{
             counter = m_columns * i + j;
             if (counter >= m_elements.count()) return QVector<int>({0, 0, 0});
             if (j < m_columns - 2){
-                if ((m_elements[counter] == m_elements[counter + 1]) && \
-                        (m_elements[counter] == m_elements[counter + 2])){
+                if ((m_elements[counter] == m_elements[counter + 1]) && (m_elements[counter] == m_elements[counter + 2])){
                     return QVector<int>({counter, counter + 1, counter + 2});
                 }
             }
             if (counter + 2 * m_columns < m_elements.count()){
-                if ((m_elements[counter] == m_elements[counter + m_columns]) && \
-                        (m_elements[counter] == m_elements[counter + 2 * m_columns])){
+                if ((m_elements[counter] == m_elements[counter + m_columns]) && (m_elements[counter] == m_elements[counter + 2 * m_columns])){
                     return QVector<int>({counter, counter + m_columns, counter + 2 * m_columns});
                 }
             }
@@ -104,7 +101,7 @@ int BubblesModel::setCellRow(int* matchRows, int index, int matched) {
 }
 void BubblesModel::findMatch()
 {
-    if (simpleMatch() != QVector<int>({0, 0, 0}) && run){
+    if (simpleMatch() != QVector<int>({0, 0, 0})){
         QVector<int> result;
         int *matchRows = new int[m_rows * m_columns];
         int *matchColumns = new int[m_rows * m_columns];
@@ -144,10 +141,6 @@ void BubblesModel::findMatch()
         delete [] matchColumns;
         delete [] matchRows;
     }
-    else if(!run){
-        checkMatch();
-    }
-
 }
 
 void BubblesModel::applyMove(int from, int to){
@@ -318,7 +311,7 @@ bool BubblesModel::move(int from, int to)
 }
 
 
-void BubblesModel::remove(QVector<int> temp_vec){
+void BubblesModel::remove(const QVector<int>& temp_vec){
     for (auto i = 0; i <= temp_vec.count() - 1; ++i){
         emit beginRemoveRows(QModelIndex(), temp_vec[i], temp_vec[i]);
         m_elements.remove(temp_vec[i]);
@@ -340,14 +333,10 @@ void BubblesModel::remove(QVector<int> temp_vec){
 }
 
 void BubblesModel::checkMatch(){
-    if (!run){
-        run = true;
         findMatch();
-        run = false;
-    }
 }
 
-void BubblesModel::setCScore(const int &val)
+void BubblesModel::setCScore(int val)
 {
     if (val != m_cScore){
         m_cScore = val;

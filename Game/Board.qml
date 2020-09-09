@@ -3,7 +3,7 @@ import Engine 1.0
 
 GridView {
     id: root
-    property int score: 0
+    property alias score: _model.cScore
     property int moves: 0
     property int preesedIndex: -1
     property bool moved: true
@@ -14,9 +14,6 @@ GridView {
 
     model: BubblesModel {
         id: _model
-        onCScoreChanged: {
-            root.score = cScore
-        }
         onOpenPopup: {
             openPopUp()
         }
@@ -26,7 +23,7 @@ GridView {
         id: _bubble
         width: root.cellWidth - 2
         height: root.cellHeight - 2
-        colorDelegate: display
+        color: display
         onSetIndex: {
             root.preesedIndex = (pos === 0) ? index : -1
         }
