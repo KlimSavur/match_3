@@ -296,7 +296,7 @@ bool BubblesModel::move(int from, int to)
 
 
 void BubblesModel::remove(const QVector<int>& temp_vec){
-    for (auto i = 0; i <= temp_vec.count() - 1; ++i){
+    for (int i = 0; i < temp_vec.count(); ++i){
         emit beginRemoveRows(QModelIndex(), temp_vec[i], temp_vec[i]);
         m_elements.remove(temp_vec[i]);
         emit endRemoveRows();

@@ -1,4 +1,4 @@
-import QtQuick 2.12
+import QtQuick 2.13
 import Engine 1.0
 
 GridView {
@@ -16,8 +16,11 @@ GridView {
         id: _model
         onOpenPopup: {
             openPopUp()
+            root.preesedIndex = -1
         }
     }
+
+
 
     delegate: Bubble {
         id: _bubble
@@ -25,12 +28,15 @@ GridView {
         height: root.cellHeight - 2
         color: display
         onSetIndex: {
-            root.preesedIndex = (pos === 0) ? index : -1
-        }
-        onMove: {
-            if (_model.move(root.preesedIndex, index))
-                moves++;
-            root.preesedIndex = -1
+            if (root.preesedIndex !== -1){
+                _gridView.itemAtIndex(index).release()
+                _gridView.itemAtIndex(root.preesedIndex).release()
+                _bubble.release()
+                _model.move(root.preesedIndex, index)
+                root.preesedIndex = -1
+            }
+            else
+                root.preesedIndex = index
         }
     }
 

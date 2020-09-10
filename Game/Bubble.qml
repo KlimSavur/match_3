@@ -2,27 +2,30 @@ import QtQuick 2.12
 
 Rectangle {
     id: root
-    signal move()
-    signal setIndex(int pos)
+    signal setIndex()
+    signal release()
     radius: Math.max(height, width) / 2
     border.color: Qt.darker(color)
     border.width: 1
     RoundMouseArea {
         anchors.fill: parent
         onIndexChange: {
-            setIndex(index)
+            setIndex()
         }
         onRestartPress: {
+            if (scale === 1)
             _pressAnimation.restart()
-        }
-        onRestartRelease: {
-            _releaseAnimation.restart()
-        }
-
-        onEntered: {
-            move()
+            else{
+                _pressAnimation.stop()
+                _releaseAnimation.restart()
+            }
         }
     }
+    onRelease: {
+        _pressAnimation.stop()
+        _releaseAnimation.restart();
+    }
+
     NumberAnimation {
         id: _pressAnimation
         target: root;
