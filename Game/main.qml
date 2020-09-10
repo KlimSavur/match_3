@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Window 2.12
+import Engine 1.0
 ApplicationWindow {
     id: _window
     property int cellHeightJSON: 0
@@ -40,29 +41,21 @@ ApplicationWindow {
     }
 
     Component.onCompleted: {
-        var xhr = new XMLHttpRequest;
-        xhr.open("GET", ":/../cfg.json");
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === XMLHttpRequest.DONE) {
-                var js = JSON.parse(xhr.responseText)
-                if (js.columns > 20){
-                    width = 600
-                }
-                height = _header.height + (_header.width / js.columns) * js.rows
-                if (height > Screen.desktopAvailableHeight){
-                    height = Screen.desktopAvailableHeight;
-                    cellHeightJSON = (height - _header.height) / js.rows
-                    width = cellHeightJSON * js.columns
-                } else {
-                    cellHeightJSON = width / js.columns
-                }
-                maximumHeight= height
-                maximumWidth= width
-                minimumHeight= height
-                minimumWidth= width
-                cellWidthJSON = width / js.columns
-            }
-       }
-       xhr.send();
+        if (JSON_loader.columns() > 20){
+            width = 600
+        }
+        height = _header.height + (_header.width / JSON_loader.columns()) * JSON_loader.rows()
+        if (height > Screen.desktopAvailableHeight){
+            height = Screen.desktopAvailableHeight;
+            cellHeightJSON = (height - _header.height) / JSON_loader.rows()
+            width = cellHeightJSON * JSON_loader.columns()
+        } else {
+            cellHeightJSON = width / JSON_loader.columns()
+        }
+        maximumHeight= height
+        maximumWidth= width
+        minimumHeight= height
+        minimumWidth= width
+        cellWidthJSON = width / JSON_loader.columns()
     }
 }

@@ -1,21 +1,7 @@
 ﻿#include "bubblesmodel.h"
-#include <QRandomGenerator>
+#include "json_loader.h"
 
-void BubblesModel::loadFromJSON()
-{
-    QString text;
-    QFile file;
-    file.setFileName("cfg.json");
-    file.open(QIODevice::ReadOnly | QIODevice::Text);
-    text = file.readAll();
-    file.close();
-    QJsonDocument JSON_doc = QJsonDocument::fromJson(text.toUtf8());
-    for(auto i: JSON_doc["colors"].toArray()){
-         m_avaliableColors.push_back(QColor(i.toString()));
-    }
-    m_columns = JSON_doc["columns"].toInt();
-    m_rows = JSON_doc["rows"].toInt();
-}
+#include <QRandomGenerator>
 
 QColor BubblesModel::randomColor() const
 {
@@ -65,7 +51,7 @@ void BubblesModel::generateBoard()
     emit endResetModel();
 }
 
-int BubblesModel::setCell(int* matchColumns, int index, int matched) {
+int BubblesModel::setCell(QScopedArrayPointer<int>& matchColumns, int index, int matched) {
     if (index % m_columns >= m_columns - 1){
         matchColumns[index] = matched;
         return matched;
@@ -82,7 +68,7 @@ int BubblesModel::setCell(int* matchColumns, int index, int matched) {
         return matched;
     }
 }
-int BubblesModel::setCellRow(int* matchRows, int index, int matched) {
+int BubblesModel::setCellRow(QScopedArrayPointer<int>& matchRows, int index, int matched) {
     if (index / m_columns >= m_rows - 1){
         matchRows[index] = matched;
         return matched;
@@ -103,8 +89,8 @@ void BubblesModel::findMatch()
 {
     if (simpleMatch() != QVector<int>({0, 0, 0})){
         QVector<int> result;
-        int *matchRows = new int[m_rows * m_columns];
-        int *matchColumns = new int[m_rows * m_columns];
+        QScopedArrayPointer<int> matchRows (new int[m_rows * m_columns]);
+        QScopedArrayPointer<int> matchColumns (new int[m_rows * m_columns]);
         for (int i = 0; i < m_rows * m_columns; ++i){
             matchRows[i] = 0;
         }
@@ -138,8 +124,6 @@ void BubblesModel::findMatch()
             }
         }
         remove(result);
-        delete [] matchColumns;
-        delete [] matchRows;
     }
 }
 
@@ -159,8 +143,8 @@ void BubblesModel::applyMove(int from, int to){
 
 bool BubblesModel::isLoss()
 {
-    int *matchRows = new int[m_rows * m_columns];
-    int *matchColumns = new int[m_rows * m_columns];
+    QScopedArrayPointer<int> matchRows (new int[m_rows * m_columns]);
+    QScopedArrayPointer<int> matchColumns (new int[m_rows * m_columns]);
     for (int i = 0; i < m_rows * m_columns; ++i){
         matchRows[i] = 0;
     }
@@ -333,7 +317,7 @@ void BubblesModel::remove(const QVector<int>& temp_vec){
 }
 
 void BubblesModel::checkMatch(){
-        findMatch();
+    findMatch();
 }
 
 void BubblesModel::setCScore(int val)
@@ -354,7 +338,9 @@ BubblesModel::BubblesModel(QObject *parent)
     : QAbstractListModel(parent)
 {
     m_cScore = 0;
-    loadFromJSON();
+    m_columns = JSON_loader::getInstace()->columns();
+    m_rows = JSON_loader::getInstace()->rows();
+    m_avaliableColors = JSON_loader::getInstace()->avaliableColors();
     generateBoard();
 }
 

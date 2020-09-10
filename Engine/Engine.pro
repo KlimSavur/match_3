@@ -10,11 +10,13 @@ QML_XHR_ALLOW_FILE_READ=1
 # Input
 SOURCES += \
         bubblesmodel.cpp \
-        engine_plugin.cpp
+        engine_plugin.cpp \
+        json_loader.cpp
 
 HEADERS += \
         bubblesmodel.h \
-        engine_plugin.h
+        engine_plugin.h \
+        json_loader.h
 
 DISTFILES = qmldir
 
